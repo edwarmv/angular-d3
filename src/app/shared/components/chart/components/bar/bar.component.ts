@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as d3 from 'd3';
+import { NumberValue } from 'd3';
 
 @Component({
   selector: 'app-bar',
@@ -126,6 +127,7 @@ export class BarComponent implements AfterViewInit {
       frequency: 0.00074,
     },
   ];
+
   width = 928;
   height = 500;
   marginTop = 30;
@@ -137,6 +139,8 @@ export class BarComponent implements AfterViewInit {
     if (!this.elementRef) {
       throw Error('Container does not exist');
     }
+    // this.elementRef.nativeElement.append();
+    d3.select('#bar').append(() => this.create()!)
   }
 
   create() {
@@ -157,7 +161,7 @@ export class BarComponent implements AfterViewInit {
     // Declare the y (vertical position) scale.
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.frequency)])
+      .domain([0, d3.max(data, (d) => d.frequency)!])
       .range([this.height - this.marginBottom, this.marginTop]);
 
     // Create the SVG container.
@@ -175,7 +179,7 @@ export class BarComponent implements AfterViewInit {
       .selectAll()
       .data(data)
       .join('rect')
-      .attr('x', (d) => x(d.letter))
+      .attr('x', (d) => x(d.letter)!)
       .attr('y', (d) => y(d.frequency))
       .attr('height', (d) => y(0) - y(d.frequency))
       .attr('width', x.bandwidth());
@@ -190,7 +194,7 @@ export class BarComponent implements AfterViewInit {
     svg
       .append('g')
       .attr('transform', `translate(${this.marginLeft},0)`)
-      .call(d3.axisLeft(y).tickFormat((y) => (y * 100).toFixed()))
+      .call(d3.axisLeft(y).tickFormat((y) => (y.valueOf() * 100).toFixed()))
       .call((g) => g.select('.domain').remove())
       .call((g) =>
         g
